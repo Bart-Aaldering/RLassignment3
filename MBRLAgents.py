@@ -17,18 +17,32 @@ class DynaAgent:
         self.n_states = n_states
         self.n_actions = n_actions
         self.learning_rate = learning_rate
-        self.gamma = gamma
-        self.Q_sa = np.zeros((n_states,n_actions))
-        # TO DO: Initialize count tables, and reward sum tables. 
+        self.gamma = gamma # discount factor
+        self.Q_sa = np.zeros((n_states, n_actions))
+        # TO DO: Initialize count tables, and reward sum tables.
+        self.n = np.zeros((n_states, n_actions, n_states))
+        self.r = np.zeros((n_states, n_actions, n_states))
         
-    def select_action(self, s, epsilon):
-        # TO DO: Add own code
-        a = np.random.randint(0,self.n_actions) # Replace this with correct action selection
-        return a
+    def select_action(self, state, epsilon):
+        # If a random number is within the explore rate we explore by choosing a random action
+        if np.random.uniform(0,1) <= epsilon:
+            return np.random.choice(range(self.n_actions))
         
-    def update(self,s,a,r,done,s_next,n_planning_updates):
-        # TO DO: Add own code
-        pass
+        # If we don't explore we choose the action with the highest reward 
+        # If there are multiple actions with the same reward we choose the first one
+        return np.argmax(self.Q_sa[state])
+        
+    def update(self, state, action, reward, done, next_state, n_planning_updates):
+        self.n[state][action][next_state] += 1 
+        self.r[state][action][next_state] += reward
+        
+        self.Q_sa[state,action] += self.learning_rate * (reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
+
+        for k in n_planning_updates:
+            s = np.where(np.sum(self.n[state][action], axis=) == 0)[0]
+            
+        # Update q value
+        self.q[state][action] += alpha*(next_reward+df*max(self.q[next_state])-self.q[state][action])
     
 class PrioritizedSweepingAgent:
 
