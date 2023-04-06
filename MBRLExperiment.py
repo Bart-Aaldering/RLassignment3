@@ -63,7 +63,7 @@ def experiment():
         ##### Assignment 1c: effect of learning_rate ######
         epsilon=0.1
         n_planning_updates = 5
-        learning_rates = [0.1,0.5,1.0,2.0]
+        learning_rates = [0.1,0.5,1.0]
         Plot = LearningCurvePlot(title = '{}: effect of learning rate'.format(policy))
     
         for learning_rate in learning_rates:
