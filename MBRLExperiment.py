@@ -41,8 +41,8 @@ def run_repetitions(policy, n_repetitions, n_timesteps, smoothing_window, learni
             # Select action, transition, update policy
             a = pi.select_action(s,epsilon)
             s_next,r,done = env.step(a)
-            total_r += r
-            rewards[t] = total_r
+            # total_r += r
+            rewards[t] = r
             pi.update(s, a, r, done, s_next,n_planning_updates=n_planning_updates)
             
             # Reset environment when terminated
