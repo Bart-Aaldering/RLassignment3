@@ -65,7 +65,7 @@ class PrioritizedSweepingAgent:
         self.learning_rate = learning_rate
         self.gamma = gamma # discount factor
         self.priority_cutoff = priority_cutoff
-        self.queue = PriorityQueue()
+        self.queue = PriorityQueue(max_queue_size)
         
         self.Q_sa = np.zeros((n_states,n_actions))
         # TO DO: Initialize count tables, and reward sum tables. 

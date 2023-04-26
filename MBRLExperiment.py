@@ -64,7 +64,7 @@ def experiment():
     smoothing_window = 101
     gamma = 0.99
 
-    for policy in ["Dyna","Prioritized Sweeping"]:
+    for policy in ["Prioritized Sweeping"]:
     
         ##### Assignment a: effect of epsilon ######
         learning_rate = 0.5
