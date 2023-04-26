@@ -92,7 +92,7 @@ class PrioritizedSweepingAgent:
         if done:
             return
         
-        self.n[state][action][next_state] += 1 
+        self.n[state][action][next_state] += 1
         self.r[state][action][next_state] += reward
         
         self.Q_sa[state][action] += self.learning_rate * (reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
@@ -100,7 +100,6 @@ class PrioritizedSweepingAgent:
         p = abs(reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
         if p > self.priority_cutoff:
             self.queue.put((-p,(state,action)))
-
 
         for _ in range(n_planning_updates):
             if self.queue.empty():
