@@ -66,7 +66,7 @@ def experiment():
     smoothing_window = 101
     gamma = 0.99
 
-    for policy in ["Dyna","Prioritized Sweeping"]:
+    for policy in ["Prioritized Sweeping"]:
     
         ##### Assignment a: effect of epsilon ######
         learning_rate = 0.5
@@ -79,7 +79,7 @@ def experiment():
                                            learning_rate, gamma, epsilon, n_planning_updates)
             Plot.add_curve(learning_curve,label="$\epsilon$ = {}".format(epsilon))
         Plot.save("{}_egreedy.png".format(policy))
-        
+
         ##### Assignment b: effect of n_planning_updates ######
         epsilon=0.1
         n_planning_updatess = [1,5,15]
@@ -106,5 +106,5 @@ def experiment():
     
 if __name__ == "__main__":
     experiment()
-    print(["123", "456"][0])
+    # print(["123", "456"][0])
         

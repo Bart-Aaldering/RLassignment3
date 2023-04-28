@@ -71,6 +71,8 @@ class PrioritizedSweepingAgent:
         # TO DO: Initialize count tables, and reward sum tables. 
         self.n = np.zeros((n_states, n_actions, n_states))
         self.r = np.zeros((n_states, n_actions, n_states))
+        self.p_hat = np.zeros((n_states, n_actions, n_states))
+        self.r_hat = np.zeros((n_states, n_actions, n_states))
 
     def select_action(self, state, epsilon):
         # If a random number is within the explore rate we explore by choosing a random action
@@ -94,9 +96,15 @@ class PrioritizedSweepingAgent:
         
         self.n[state][action][next_state] += 1 
         self.r[state][action][next_state] += reward
+
+        # Update model
+        self.p_hat[state][action][next_state] = self.n[state][action][next_state]/np.sum(self.n[state][action][next_state])
+        self.r_hat[state][action][next_state] = self.r[state][action][next_state]/self.n[state][action][next_state]
         
+        # Update Q-table
         self.Q_sa[state][action] += self.learning_rate * (reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
 
+        # Calculate priority
         p = abs(reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
         if p > self.priority_cutoff:
             self.queue.put((-p,(state,action)))
@@ -105,25 +113,24 @@ class PrioritizedSweepingAgent:
         for _ in range(n_planning_updates):
             if self.queue.empty():
                 break
-            p,(state, action) = self.queue.get()
 
-             # Choose next state
-            p_hat = self.n[state][action]/np.sum(self.n[state][action])
-            next_state = np.random.choice(np.arange(self.n_states), p=p_hat)
+            p,(plan_state, plan_action) = self.queue.get()
             
-            reward = self.r[state][action][next_state]/self.n[state][action][next_state]
+             # Choose next state and reward from p_hat and r_hat
+            next_state = np.random.choice(np.arange(self.n_states), p=self.p_hat[plan_state][plan_action])
+            reward = self.r_hat[plan_state][plan_action][next_state]
 
-            # Update q value
-            self.Q_sa[state][action] += self.learning_rate * (reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[state][action])
+            # Update q value   
+            self.Q_sa[plan_state][plan_action] += self.learning_rate * (reward + self.gamma * max(self.Q_sa[next_state])-self.Q_sa[plan_state][plan_action])
 
             # Loop over all state actions that may lead to state s
             for previous_state in range(self.n_states):
                 for action in range(self.n_actions):
-                    if self.n[previous_state][action][state] > 0:
+                    if self.n[previous_state][action][plan_state] > 0:
 
                         # Calculate reward and priority value
-                        reward = self.r[previous_state][action][state]/self.n[previous_state][action][state]
-                        p = abs(reward + self.gamma * max(self.Q_sa[previous_state])-self.Q_sa[previous_state][action])
+                        reward = self.r_hat[previous_state][action][plan_state]
+                        p = abs(reward + self.gamma * max(self.Q_sa[plan_state])-self.Q_sa[previous_state][action])
                         if p > self.priority_cutoff:
                             self.queue.put((-p,(previous_state,action)))
 
@@ -183,3 +190,4 @@ def test():
     
 if __name__ == '__main__':
     test()
+    
