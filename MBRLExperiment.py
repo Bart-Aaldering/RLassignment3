@@ -35,21 +35,19 @@ def run_repetitions(policy, n_repetitions, n_timesteps, smoothing_window, learni
             raise KeyError(f"Policy {policy} not implemented")
         
         # Prepare for running
-        s = env.reset()  
-        total_r = 0
+        state = env.reset()  
         for t in range(n_timesteps):            
             # Select action, transition, update policy
-            a = pi.select_action(s,epsilon)
-            s_next,r,done = env.step(a)
-            # total_r += r
-            rewards[t] = r
-            pi.update(s, a, r, done, s_next,n_planning_updates=n_planning_updates)
+            action = pi.select_action(state,epsilon)
+            s_next,reward,done = env.step(action)
+            rewards[t] = reward
+            pi.update(state, action, reward, done, s_next,n_planning_updates=n_planning_updates)
             
             # Reset environment when terminated
             if done:
-                s = env.reset()
+                state = env.reset()
             else:
-                s = s_next
+                state = s_next
         cumulative_rewards += rewards
     cumulative_rewards /= n_repetitions
     
